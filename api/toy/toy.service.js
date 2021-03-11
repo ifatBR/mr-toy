@@ -10,7 +10,7 @@ async function query(filterBy) {
         const collection = await dbService.getCollection('toy');
         var allToys = await collection.find().toArray();
         var toys = await collection.find(criteria).toArray();
-
+        // console.log('toys:', toys);
         toys.sort((toy1, toy2) => {
             if (filterBy.sortBy === 'price') return toy1.price - toy2.price;
             return toy1.name.localeCompare(toy2.name);
@@ -18,7 +18,6 @@ async function query(filterBy) {
 
         const startIdx = _getStartIdx(filterBy.pageDiff, toys.length);
         toys = toys.slice(startIdx, startIdx + PAGE_SIZE);
-        console.log('toys:', toys);
         return { toys, allToys };
     } catch (err) {
         throw err;
@@ -36,18 +35,17 @@ async function getById(toyId) {
 }
 
 async function save(toy) {
-
     try {
         let savedToy = null;
         const collection = await dbService.getCollection('toy');
         if (toy._id) {
-            const toyToUpdate = {...toy}
+            const toyToUpdate = { ...toy };
             delete toyToUpdate._id;
             await collection.updateOne({ _id: ObjectId(toy._id) }, { $set: { ...toyToUpdate } });
             return toy;
         } else {
-            savedToy = await collection.insert(toy)
-            return savedToy.ops[0]
+            savedToy = await collection.insert(toy);
+            return savedToy.ops[0];
         }
     } catch (err) {
         throw err;
@@ -72,17 +70,21 @@ function _getStartIdx(diff, amount) {
 }
 
 function _buildCriteria(filterBy) {
+    let typesCriteria;
+    if (filterBy.types && filterBy.types.length) {
+        filterBy.types = filterBy.types.split(',');
+        typesCriteria = filterBy.types.map((type) => {
+            return { type: type };
+        });
+    }
     const criteria = {};
     if (filterBy.name) {
         const txtCriteria = { $regex: filterBy.name, $options: 'i' };
         criteria.name = txtCriteria;
     }
-    if (filterBy.inStock !== 'all') criteria.inStock = filterBy.inStock;
-    if (filterBy.types && filterBy.types.length) criteria.$or = filterBy.types;
+    if (filterBy.inStock !== 'all') criteria.inStock = JSON.parse(filterBy.inStock);
+    if (filterBy.types && filterBy.types.length) criteria.$or = typesCriteria;
     return criteria;
-    // return regex.test(toy.name)
-    // && (filterBy.inStock === 'all' || toy.inStock === JSON.parse(filterBy.inStock))
-    // && (!filterBy.types || !filterBy.types.length || filterBy.types.includes(toy.type.toLowerCase()))
 }
 module.exports = {
     query,

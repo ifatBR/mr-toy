@@ -1,6 +1,7 @@
 const toyService = require('./toy.service');
 
 async function getToys(req, res) {
+    // console.log(req.query);
     try {
         let filterBy = req.query;
         if (!Object.keys(filterBy).length) filterBy = { name: '', inStock: 'all', types: [], sortBy: 'name', pageDiff: 0 };
@@ -33,6 +34,8 @@ async function addToy(req, res) {
 }
 
 async function updateToy(req, res) {
+    // console.log('body',req.body);
+    // console.log('query',req.query);
     try {
         const { name, price, type, createdAt, inStock, _id } = req.body;
         const toy = { name, price, type, createdAt, inStock, _id };
