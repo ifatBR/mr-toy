@@ -28,7 +28,7 @@ async function query(filterBy) {
 async function getById(toyId) {
     try {
         const collection = await dbService.getCollection('toy');
-        const toy = await collection.findOne({ "_id": ObjectId(toyId) });
+        const toy = await collection.findOne({ _id: ObjectId(toyId) });
         return toy;
     } catch (err) {
         throw err;
@@ -36,18 +36,19 @@ async function getById(toyId) {
 }
 
 async function save(toy) {
-    const toyId = toy._id;
-    try {
-        const collection = await dbService.getCollection('toy');
-        if (toyId) {
-            delete toy._id
-            console.log({...toy});
-            await collection.updateOne({ "_id": ObjectId(toy._id)}, {$set:{...toy}})
-        } else {
-            await collection.insert(toy)
-        }
-        return toy;
 
+    try {
+        let savedToy = null;
+        const collection = await dbService.getCollection('toy');
+        if (toy._id) {
+            const toyToUpdate = {...toy}
+            delete toyToUpdate._id;
+            await collection.updateOne({ _id: ObjectId(toy._id) }, { $set: { ...toyToUpdate } });
+            return toy;
+        } else {
+            savedToy = await collection.insert(toy)
+            return savedToy.ops[0]
+        }
     } catch (err) {
         throw err;
     }
@@ -56,7 +57,7 @@ async function save(toy) {
 async function remove(toyId) {
     try {
         const collection = await dbService.getCollection('toy');
-        await collection.remove({ "_id": ObjectId(toyId) });
+        await collection.remove({ _id: ObjectId(toyId) });
     } catch (err) {
         throw err;
     }
@@ -87,5 +88,5 @@ module.exports = {
     query,
     getById,
     remove,
-    save
+    save,
 };
