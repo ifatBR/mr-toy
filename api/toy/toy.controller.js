@@ -1,4 +1,4 @@
-const userService = require('./toy.service');
+const toyService = require('./toy.service');
 
 async function getToys(req, res) {
     try {
