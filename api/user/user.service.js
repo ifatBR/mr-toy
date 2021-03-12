@@ -97,6 +97,8 @@ async function add(user) {
             username: user.username,
             password: user.password,
             fullname: user.fullname,
+            isAdmin: user.isAdmin,
+            reviews:null,
             score: user.score || 0
         }
         const collection = await dbService.getCollection('user')
