@@ -1,5 +1,6 @@
 const dbService = require('../../services/db.service');
 const ObjectId = require('mongodb').ObjectId;
+const utilService =require('../../services/util.service.js')
 
 const PAGE_SIZE = 3;
 let pageIdx = 0;
@@ -46,6 +47,7 @@ async function save(toy) {
         } else {
             toy.createdAt = Date.now();
             toy.reviews = null;
+            toy.url = utilService.getRandomInt(1,17)+ '.jpg'
             savedToy = await collection.insert(toy);
             return savedToy.ops[0];
         }
@@ -62,6 +64,20 @@ async function remove(toyId) {
         throw err;
     }
 }
+
+async function addReview(toyId, review){
+    try{
+        const toy = await getById(toyId) ;
+        if(!toy.reviews) toy.reviews = [];
+        toy.reviews.push(review)
+        await save(toy);
+        return(review)
+    } catch (err) {
+        throw err;
+    }
+}
+
+
 
 function _getStartIdx(diff, amount) {
     pageIdx += +diff;
@@ -88,9 +104,12 @@ function _buildCriteria(filterBy) {
     if (filterBy.types && filterBy.types.length) criteria.$or = typesCriteria;
     return criteria;
 }
+
+
 module.exports = {
     query,
     getById,
     remove,
     save,
+    addReview
 };

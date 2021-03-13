@@ -56,10 +56,23 @@ async function removeToy(req,res){
             res.status(401).send({err:'Cannot remove toy'})
         }
 }
+
+async function addReview(req,res){
+    console.log('adding');
+    try{
+        const {toyId}= req.params
+        const {review} = req.body
+        console.log('req.body:', req.body)
+        await toyService.addReview(toyId, review)
+    }catch(err){
+        res.status(401).send({err:'Cannot save review'})
+    }
+}
 module.exports = {
     getToys,
     getToyById,
     addToy,
     updateToy,
-    removeToy
+    removeToy,
+    addReview
 };
