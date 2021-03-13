@@ -37,8 +37,7 @@ async function updateToy(req, res) {
     // console.log('body',req.body);
     // console.log('query',req.query);
     try {
-        const { name, price, type, createdAt, inStock, _id } = req.body;
-        const toy = { name, price, type, createdAt, inStock, _id };
+        const toy = req.body;
         const savedToy = await toyService.save(toy);
         res.send(savedToy);
 

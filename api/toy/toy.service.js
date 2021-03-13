@@ -44,6 +44,8 @@ async function save(toy) {
             await collection.updateOne({ _id: ObjectId(toy._id) }, { $set: { ...toyToUpdate } });
             return toy;
         } else {
+            toy.createdAt = Date.now();
+            toy.reviews = null;
             savedToy = await collection.insert(toy);
             return savedToy.ops[0];
         }
