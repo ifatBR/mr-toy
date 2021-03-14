@@ -36,6 +36,8 @@ const {connectSockets} = require('./services/socket.service')
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
 app.all('*', setupAsyncLocalStorage)
 
+// TODO: check with app.use
+
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/review', reviewRoutes)
@@ -55,7 +57,7 @@ http.listen(port, () => {
     logger.info('Server is running on port: ' + port)
 })
 
-// console.log('I am Here!, am I?')
+console.log('I am Here!, am I?')
 
 
 

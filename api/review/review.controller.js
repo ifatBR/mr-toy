@@ -1,10 +1,11 @@
 const logger = require('../../services/logger.service')
-const userService = require('../user/user.service')
+const toyService = require('../toy/toy.service')
 const reviewService = require('./review.service')
 
 async function getReviews(req, res) {
     try {
         const reviews = await reviewService.query(req.query)
+        console.log('reviews:',  reviews)
         res.send(reviews)
     } catch (err) {
         logger.error('Cannot get reviews', err)
@@ -26,10 +27,11 @@ async function deleteReview(req, res) {
 async function addReview(req, res) {
     try {
         var review = req.body
-        review.byUserId = req.session.user._id
+        review.userId = req.session.user._id
         review = await reviewService.add(review)
-        review.byUser = req.session.user
-        review.aboutUser = await userService.getById(review.aboutUserId)
+        review.user = req.session.user
+        
+        review.toy = await toyService.getById(review.toyId)
         res.send(review)
 
     } catch (err) {

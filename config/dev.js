@@ -1,3 +1,4 @@
 module.exports = {
-  'dbURL': 'mongodb://localhost:27017',
+  'dbURL': 'mongodb+srv://ifat:1234@cluster0.ign0w.mongodb.net/mr_toy?retryWrites=true&w=majority',
+  // 'dbURL': 'mongodb://localhost:27017',
 }

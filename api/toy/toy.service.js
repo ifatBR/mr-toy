@@ -8,7 +8,7 @@ let pageIdx = 0;
 async function query(filterBy) {
     const criteria = _buildCriteria(filterBy);
     try {
-        const collection = await dbService.getCollection('toy');
+        const collection = await dbService.getCollection('mr_toy');
         var allToys = await collection.find().toArray();
         var toys = await collection.find(criteria).toArray();
         // console.log('toys:', toys);
@@ -27,7 +27,7 @@ async function query(filterBy) {
 
 async function getById(toyId) {
     try {
-        const collection = await dbService.getCollection('toy');
+        const collection = await dbService.getCollection('mr_toy');
         const toy = await collection.findOne({ _id: ObjectId(toyId) });
         return toy;
     } catch (err) {
@@ -36,9 +36,10 @@ async function getById(toyId) {
 }
 
 async function save(toy) {
+    console.log('toy:', toy)
     try {
         let savedToy = null;
-        const collection = await dbService.getCollection('toy');
+        const collection = await dbService.getCollection('mr_toy');
         if (toy._id) {
             const toyToUpdate = { ...toy };
             delete toyToUpdate._id;
@@ -58,7 +59,7 @@ async function save(toy) {
 
 async function remove(toyId) {
     try {
-        const collection = await dbService.getCollection('toy');
+        const collection = await dbService.getCollection('mr_toy');
         await collection.remove({ _id: ObjectId(toyId) });
     } catch (err) {
         throw err;

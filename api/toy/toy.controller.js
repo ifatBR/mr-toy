@@ -1,7 +1,6 @@
 const toyService = require('./toy.service');
 
 async function getToys(req, res) {
-    // console.log(req.query);
     try {
         let filterBy = req.query;
         if (!Object.keys(filterBy).length) filterBy = { name: '', inStock: 'all', types: [], sortBy: 'name', pageDiff: 0 };
@@ -24,8 +23,7 @@ async function getToyById(req, res) {
 
 async function addToy(req, res) {
     try {
-        const { name, price, type, createdAt, inStock} = req.body; //TODO: make sure frontend doesnt add _id
-        const toy = { name, price, type, createdAt, inStock};
+        const toy = req.body; //TODO: make sure frontend doesnt add _id
         const savedToy = await toyService.save(toy);
         res.send(savedToy);
     } catch (err) {

@@ -3,7 +3,10 @@ const ObjectId = require('mongodb').ObjectId
 const asyncLocalStorage = require('../../services/als.service')
 
 async function query(filterBy = {}) {
+
     try {
+        if(filterBy.toyId) filterBy = {toyId:ObjectId(filterBy.toyId)}
+        if(filterBy.userId) filterBy = {userId:ObjectId(filterBy.userId)}
         // const criteria = _buildCriteria(filterBy)
         const collection = await dbService.getCollection('review')
         // const reviews = await collection.find(criteria).toArray()
@@ -14,36 +17,36 @@ async function query(filterBy = {}) {
             {
                 $lookup:
                 {
+                    localField: 'userId',
                     from: 'user',
-                    localField: 'byUserId',
                     foreignField: '_id',
-                    as: 'byUser'
+                    as: 'user'
                 }
             },
             {
-                $unwind: '$byUser'
+                $unwind: '$user'
             },
             {
                 $lookup:
                 {
-                    from: 'user',
-                    localField: 'aboutUserId',
+                    localField: 'toyId',
+                    from: 'mr_toy',
                     foreignField: '_id',
-                    as: 'aboutUser'
+                    as: 'toy'
                 }
             },
             {
-                $unwind: '$aboutUser'
+                $unwind: '$toy'
             }
         ]).toArray()
         reviews = reviews.map(review => {
-            review.byUser = { _id: review.byUser._id, fullname: review.byUser.fullname }
-            review.aboutUser = { _id: review.aboutUser._id, fullname: review.aboutUser.fullname }
-            delete review.byUserId
-            delete review.aboutUserId
+            review.createdAt = ObjectId(review._id).getTimestamp();
+            review.user = { _id: review.user._id, username: review.user.username }
+            review.toy = { _id: review.toy._id, name: review.toy.name, price: review.toy.price }
+            delete review.userId
+            delete review.toyId
             return review
         })
-
         return reviews
     } catch (err) {
         logger.error('cannot find reviews', err)
@@ -73,8 +76,8 @@ async function add(review) {
     try {
         // peek only updatable fields!
         const reviewToAdd = {
-            byUserId: ObjectId(review.byUserId),
-            aboutUserId: ObjectId(review.aboutUserId),
+            userId: ObjectId(review.userId),
+            toyId: ObjectId(review.toyId),
             txt: review.txt
         }
         const collection = await dbService.getCollection('review')
