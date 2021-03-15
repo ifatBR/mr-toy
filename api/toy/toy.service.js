@@ -78,6 +78,18 @@ async function addReview(toyId, review){
     }
 }
 
+async function addMsg({msg, toyId}){
+    try{
+        msg.createdAt = Date.now();
+        msg.id = utilService.makeId();
+        const toy = await getById(toyId);
+        if(!toy.msgs) toy.msgs = []
+        toy.msgs.push(msg);
+        save(toy);
+    }catch (err) {
+        throw err;
+    }
+}
 
 
 function _getStartIdx(diff, amount) {
@@ -112,5 +124,6 @@ module.exports = {
     getById,
     remove,
     save,
-    addReview
+    addReview,
+    addMsg
 };

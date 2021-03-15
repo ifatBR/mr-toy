@@ -1,4 +1,4 @@
-
+const toyService = require('../api/toy/toy.service')
 
 const asyncLocalStorage = require('./als.service');
 const logger = require('./logger.service');
@@ -15,6 +15,7 @@ function connectSockets(http, session) {
         autoSave: true
     }));
     gIo.on('connection', socket => {
+        console.log(socket.id);
         // console.log('socket.handshake', socket.handshake)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
         // TODO: emitToUser feature - need to tested for CaJan21
@@ -34,13 +35,18 @@ function connectSockets(http, session) {
             // logger.debug('Session ID is', socket.handshake.sessionID)
             socket.myTopic = topic
         })
-        socket.on('chat newMsg', msg => {
+        socket.on('chat newMsg', ({msg, toyId}) => {
             // emits to all sockets:
             // gIo.emit('chat addMsg', msg)
             // emits only to sockets in the same room
-            gIo.to(socket.myTopic).emit('chat addMsg', msg)
+            // gIo.to(socket.myTopic).emit('chat addMsg', msg)
+            socket.to(socket.myTopic).emit('chat addMsg',msg)
+            toyService.addMsg({msg, toyId})
         })
-
+        socket.on('chat userTyping', username => {          
+            socket.to(socket.myTopic).emit('chat isTyping', username)
+        }
+        )
     })
 }
 
